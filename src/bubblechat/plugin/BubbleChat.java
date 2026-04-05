@@ -1,4 +1,4 @@
-package bubblechat;
+package bubblechat.plugin;
 
 import java.util.List;
 

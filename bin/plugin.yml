@@ -1,8 +1,18 @@
 name: BubbleChat
 version: 0.1
-main: bubblechat.Main
+main: bubblechat.plugin.Main
 api-version: 1.20
+author: Dharshan Palani
+description: Displays chat messages as bubbles above players.
 
 commands:
   bubblechat:
-    description: Toggle bubble chat on/off
+    description: Main command for BubbleChat
+    usage: /bubblechat <toggle|update>
+    aliases: [bc]
+    permission: bubblechat.admin
+
+permissions:
+  bubblechat.admin:
+    description: Allows access to all BubbleChat commands
+    default: op

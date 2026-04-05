@@ -1,0 +1,8 @@
+name: BubbleChat
+version: 0.1
+main: bubblechat.Main
+api-version: 1.20
+
+commands:
+  bubblechat:
+    description: Toggle bubble chat on/off

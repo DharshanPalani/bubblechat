@@ -8,10 +8,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.TextDisplay;
 
 public class BubbleChatManager {
-	private final Map<UUID, List<ArmorStand>> bubble = new HashMap<>();
+	private final Map<UUID, List<TextDisplay>> bubble = new HashMap<>();
 	
 	private boolean enabled = true;
 	
@@ -27,27 +27,27 @@ public class BubbleChatManager {
 		this.enabled = !this.enabled;
 	}
 
-	public void add(UUID playerUUID, ArmorStand stand) {
-	    List<ArmorStand> stands = bubble.getOrDefault(playerUUID, new ArrayList<>());
-	    stands.add(stand);
+	public void add(UUID playerUUID, TextDisplay text) {
+	    List<TextDisplay> texts = bubble.getOrDefault(playerUUID, new ArrayList<>());
+	    texts.add(text);
 	    
-	    bubble.put(playerUUID, stands);
+	    bubble.put(playerUUID, texts);
 	}
 
-	public List<ArmorStand> getBubbles(UUID playerUUID) {
+	public List<TextDisplay> getBubbles(UUID playerUUID) {
 		
-		List<ArmorStand> stands = bubble.get(playerUUID);
+		List<TextDisplay> stands = bubble.get(playerUUID);
 
 		return stands;
 	}
 	
 	public void removeAll(UUID playerUUID) {
-	    List<ArmorStand> stands = bubble.get(playerUUID);
+	    List<TextDisplay> stands = bubble.get(playerUUID);
 	    if (stands != null) {
-	        List<ArmorStand> standsCopy = new ArrayList<>(stands);
+	        List<TextDisplay> textsCopy = new ArrayList<>(stands);
 	        
-	        for(ArmorStand stand : standsCopy) {
-	            remove(playerUUID, stand);
+	        for(TextDisplay text : textsCopy) {
+	            remove(playerUUID, text);
 	        }
 	    }
 	}
@@ -56,8 +56,8 @@ public class BubbleChatManager {
 		return new HashSet<UUID>(bubble.keySet());
 	}
    
-	public void remove(UUID playerUUID, ArmorStand stand) {
-	    List<ArmorStand> stands = bubble.get(playerUUID);
+	public void remove(UUID playerUUID, TextDisplay stand) {
+	    List<TextDisplay> stands = bubble.get(playerUUID);
 	    if (stands != null) {
 	    	stand.remove();
 	        stands.remove(stand);
@@ -69,11 +69,11 @@ public class BubbleChatManager {
 	
 	public void reloadCleanUp() {
 		for(UUID playerID : getAllPlayer()) {
-			List<ArmorStand> stands = getBubbles(playerID);
-			if(stands != null) {
-				for(ArmorStand stand : stands) {
-					if(stand != null && !stand.isDead()) {
-						stand.remove();
+			List<TextDisplay> texts = getBubbles(playerID);
+			if(texts != null) {
+				for(TextDisplay text : texts) {
+					if(text != null && !text.isDead()) {
+						text.remove();
 					}
 				}
 			}

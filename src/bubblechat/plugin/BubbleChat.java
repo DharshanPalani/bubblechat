@@ -3,13 +3,19 @@ package bubblechat.plugin;
 import java.util.List;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Display.Billboard;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.TextDisplay;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.util.Transformation;
+import org.joml.AxisAngle4f;
+import org.joml.Vector3f;
+
 
 public class BubbleChat implements Listener  {
 	private final Plugin plugin;
@@ -32,43 +38,54 @@ public class BubbleChat implements Listener  {
 		Bukkit.getScheduler().runTask(plugin, () -> {
 			Player player = event.getPlayer();
 			
-			List<ArmorStand> stands = bubbleChatManager.getBubbles(player.getUniqueId());
+			List<TextDisplay> texts = bubbleChatManager.getBubbles(player.getUniqueId());
 			
-			if(stands != null) {
+			if(texts != null) {
 			    System.out.println("Removing existing armor stands");
 			    bubbleChatManager.removeAll(player.getUniqueId());
 			}
 
 			
-			Location location = player.getLocation().add(0, 0.3, 0);
+			Location location = player.getLocation().add(0, 2, 0);
 			
-			ArmorStand stand = event.getPlayer().getWorld().spawn(location, ArmorStand.class);
+			TextDisplay text = event.getPlayer().getWorld().spawn(location, TextDisplay.class);
 			
-			stand.setVisible(false);           
-			stand.setGravity(false);            
-			stand.setCustomName("§l " + message + " §l");
-			stand.setCustomNameVisible(true);
-			stand.setArms(true);                
-			stand.setBasePlate(false);
+//			text.setVisible(false);           
+//			text.setGravity(false);            
+//			text.setCustomName(ChatColor.RED + message);
+//			text.setCustomNameVisible(true);
+//			text.setArms(true);                
+//			text.setBasePlate(false);
 
+			text.setBillboard(Billboard.CENTER);
+			text.setTransformation(new Transformation(
+			        new Vector3f(0, 0, 0),
+			        new AxisAngle4f(0, 0, 0, 1),
+			        new Vector3f(1.5f, 1.5f, 1),
+			        new AxisAngle4f(0, 0, 0, 1)
+			    ));
+			text.setText(ChatColor.GREEN +  message);
 			
-			bubbleChatManager.add(player.getUniqueId(), stand);
+			
+			
+			bubbleChatManager.add(player.getUniqueId(), text);
 			
 			Bukkit.getScheduler().runTaskTimer(plugin, () -> {
 
-			    if (stand.isDead() || !player.isOnline()) {
+			    if (text.isDead() || !player.isOnline()) {
 			        return;
 			    }
 			    
-			    Location currentLocation = player.getLocation().add(0, 0.3, 0);
+			    Location currentLocation = player.getLocation().add(0, 2, 0);
 
-			    stand.teleport(currentLocation);
+			    text.setInterpolationDelay(3);
+			    text.teleport(currentLocation);
 
-			}, 0L, 1L);
+			}, 0L, 0L);
 
 			Bukkit.getScheduler().runTaskLater(plugin, () -> {
-				stand.remove();
-				bubbleChatManager.remove(player.getUniqueId(), stand);
+				text.remove();
+				bubbleChatManager.remove(player.getUniqueId(), text);
 			}, 60L);
 		});
 		

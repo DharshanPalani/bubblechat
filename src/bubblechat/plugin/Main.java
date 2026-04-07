@@ -12,15 +12,15 @@ import bubblechat.updater.Updater;
 public class Main extends JavaPlugin {
     
     private BubbleChatManager bubbleChatManager;
-    private BubbleChat bubbleChatListener;
+    private BubbleChatListener bubbleChatListener;
     
     public boolean updating = false;
-    
+
     @Override
     public void onEnable() {
     	bubbleChatManager = new BubbleChatManager();
-        bubbleChatListener = new BubbleChat(this, this.bubbleChatManager);
-        
+        bubbleChatListener = new BubbleChatListener(this, this.bubbleChatManager);
+
         getServer().getPluginManager().registerEvents(bubbleChatListener, this);
         getLogger().info("BubbleChat enabled!");
         
@@ -89,16 +89,19 @@ public class Main extends JavaPlugin {
 
                     return true;
                 }
+                
+                else if(args[0].equalsIgnoreCase("toggle")) {                	
+                	boolean currentState = bubbleChatManager.isEnabled();
+                	bubbleChatManager.setEnabled(!currentState);
+                	
+                	if (bubbleChatManager.isEnabled()) {
+                		getLogger().info("BubbleChat has been ENABLED!");
+                	} else {
+                		getLogger().info("BubbleChat has been DISABLED!");
+                	}
+                }
             }
 
-            boolean currentState = bubbleChatManager.isEnabled();
-            bubbleChatManager.setEnabled(!currentState);
-
-            if (bubbleChatManager.isEnabled()) {
-                getLogger().info("BubbleChat has been ENABLED!");
-            } else {
-                getLogger().info("BubbleChat has been DISABLED!");
-            }
 
             return true;
         }

@@ -8,10 +8,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import org.bukkit.entity.TextDisplay;
-
 public class BubbleChatManager {
-	private final Map<UUID, List<TextDisplay>> bubble = new HashMap<>();
+	private final Map<UUID, List<BubbleChat>> bubble = new HashMap<>();
 	
 	private boolean enabled = true;
 	
@@ -27,41 +25,52 @@ public class BubbleChatManager {
 		this.enabled = !this.enabled;
 	}
 
-	public void add(UUID playerUUID, TextDisplay text) {
-	    List<TextDisplay> texts = bubble.getOrDefault(playerUUID, new ArrayList<>());
-	    texts.add(text);
+	public void add(UUID playerUUID, BubbleChat bubbleChat) {
+	    List<BubbleChat> bubbleChats = bubble.getOrDefault(playerUUID, new ArrayList<>());
+	    bubbleChats.add(bubbleChat);
 	    
-	    bubble.put(playerUUID, texts);
+	    bubble.put(playerUUID, bubbleChats);
 	}
 
-	public List<TextDisplay> getBubbles(UUID playerUUID) {
+	public List<BubbleChat> getBubbles(UUID playerUUID) {
 		
-		List<TextDisplay> stands = bubble.get(playerUUID);
+		List<BubbleChat> bubbleChats = bubble.get(playerUUID);
 
-		return stands;
+		return bubbleChats;
 	}
 	
 	public void removeAll(UUID playerUUID) {
-	    List<TextDisplay> stands = bubble.get(playerUUID);
-	    if (stands != null) {
-	        List<TextDisplay> textsCopy = new ArrayList<>(stands);
+	    List<BubbleChat> texts = bubble.get(playerUUID);
+	    if (texts != null) {
+	        List<BubbleChat> bubbleChatCopy= new ArrayList<>(texts);
 	        
-	        for(TextDisplay text : textsCopy) {
-	            remove(playerUUID, text);
+	        for(BubbleChat bubbleChat : bubbleChatCopy) {
+	            remove(playerUUID, bubbleChat);
 	        }
 	    }
+	}
+
+	public void pushUpOldMessage(UUID playerUUID) {
+		List<BubbleChat> bubbleChats = bubble.get(playerUUID);
+		
+		List<BubbleChat> bubbleChatsCopy = new ArrayList<>(bubbleChats);
+		
+		for(BubbleChat bubbleChat: bubbleChatsCopy) {
+			bubbleChat.decreaseTargetTextScale(40);
+			bubbleChat.updateTargetYAxisOffset(0.7);
+		}
 	}
 	
 	public Set<UUID> getAllPlayer() {
 		return new HashSet<UUID>(bubble.keySet());
 	}
    
-	public void remove(UUID playerUUID, TextDisplay stand) {
-	    List<TextDisplay> stands = bubble.get(playerUUID);
-	    if (stands != null) {
-	    	stand.remove();
-	        stands.remove(stand);
-	        if (stands.isEmpty()) {
+	public void remove(UUID playerUUID, BubbleChat bubbleChat) {
+	    List<BubbleChat> bubbleChats = bubble.get(playerUUID);
+	    if (bubbleChats != null) {
+	    	bubbleChat.getTextDisplay().remove();
+	        bubbleChats.remove(bubbleChat);
+	        if (bubbleChats.isEmpty()) {
 	            bubble.remove(playerUUID);
 	        }
 	    }
@@ -69,11 +78,11 @@ public class BubbleChatManager {
 	
 	public void reloadCleanUp() {
 		for(UUID playerID : getAllPlayer()) {
-			List<TextDisplay> texts = getBubbles(playerID);
-			if(texts != null) {
-				for(TextDisplay text : texts) {
-					if(text != null && !text.isDead()) {
-						text.remove();
+			List<BubbleChat> bubbleChats = getBubbles(playerID);
+			if(bubbleChats != null) {
+				for(BubbleChat bubbleChat : bubbleChats) {
+					if(bubbleChat != null && !bubbleChat.getTextDisplay().isDead()) {
+						bubbleChat.getTextDisplay().remove();
 					}
 				}
 			}

@@ -1,93 +1,74 @@
 package bubblechat.plugin;
 
-import java.util.List;
-
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.entity.Display.Billboard;
-import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Transformation;
-import org.joml.AxisAngle4f;
 import org.joml.Vector3f;
 
+public class BubbleChat {
 
-public class BubbleChat implements Listener  {
-	private final Plugin plugin;
-	
-	private BubbleChatManager bubbleChatManager;;
-	
-	BubbleChat(Plugin plugin, BubbleChatManager bubbleChatManager) {
-		this.plugin = plugin;
-		this.bubbleChatManager = bubbleChatManager;
-	}
-	
-	@EventHandler
-	public void onPlayerChat(AsyncPlayerChatEvent event) {
-		
-		if(!bubbleChatManager.isEnabled()) return;
-		
-		String message = event.getMessage();
-		
+    private final TextDisplay text;
 
-		Bukkit.getScheduler().runTask(plugin, () -> {
-			Player player = event.getPlayer();
-			
-			List<TextDisplay> texts = bubbleChatManager.getBubbles(player.getUniqueId());
-			
-			if(texts != null) {
-			    System.out.println("Removing existing armor stands");
-			    bubbleChatManager.removeAll(player.getUniqueId());
-			}
+    private double yAxisOffset;
+    private double targetYAxisOffset;
+    
+    private Vector3f scale;
+    private Vector3f targetScale;
+    
+    BubbleChat(TextDisplay text, double initialOffset) {
+        this.text = text;
+        this.yAxisOffset = initialOffset;
+        this.targetYAxisOffset = initialOffset;
+        
+        this.targetScale = text.getTransformation().getScale();
+        this.scale = new Vector3f(targetScale);
+        
+    }
 
-			
-			Location location = player.getLocation().add(0, 2, 0);
-			
-			TextDisplay text = event.getPlayer().getWorld().spawn(location, TextDisplay.class);
-			
-//			text.setVisible(false);           
-//			text.setGravity(false);            
-//			text.setCustomName(ChatColor.RED + message);
-//			text.setCustomNameVisible(true);
-//			text.setArms(true);                
-//			text.setBasePlate(false);
+    public void tick() {
 
-			text.setBillboard(Billboard.CENTER);
-			text.setTransformation(new Transformation(
-			        new Vector3f(0, 0, 0),
-			        new AxisAngle4f(0, 0, 0, 1),
-			        new Vector3f(1.5f, 1.5f, 1),
-			        new AxisAngle4f(0, 0, 0, 1)
-			    ));
-			text.setText(ChatColor.GREEN +  message);
-			
-			
-			
-			bubbleChatManager.add(player.getUniqueId(), text);
-			
-			Bukkit.getScheduler().runTaskTimer(plugin, () -> {
+        this.scale.x += (targetScale.x - scale.x) * 0.2f;
+        this.scale.y += (targetScale.y - scale.y) * 0.2f;
+        this.scale.z += (targetScale.z - scale.z) * 0.2f;
 
-			    if (text.isDead() || !player.isOnline()) {
-			        return;
-			    }
-			    
-			    Location currentLocation = player.getLocation().add(0, 2, 0);
+        this.yAxisOffset += (targetYAxisOffset - yAxisOffset) * 0.2;
 
-			    text.setInterpolationDelay(3);
-			    text.teleport(currentLocation);
+        Transformation old = text.getTransformation();
 
-			}, 0L, 0L);
+        Transformation updated = new Transformation(
+            old.getTranslation(),
+            old.getLeftRotation(),
+            scale,
+            old.getRightRotation()
+        );
 
-			Bukkit.getScheduler().runTaskLater(plugin, () -> {
-				text.remove();
-				bubbleChatManager.remove(player.getUniqueId(), text);
-			}, 60L);
-		});
-		
-	}
+        text.setTransformation(updated);
+    }
+    
+    public void updateTargetTextScale(float x, float y) {
+    	targetScale.x = x;
+    	targetScale.y = y;
+    }
+    
+    public void decreaseTargetTextScale(float percentage) {
+        float factor = 1 - (percentage / 100f);
+
+        targetScale.x *= factor;
+        targetScale.y *= factor;
+    }
+
+    public TextDisplay getTextDisplay() {
+        return text;
+    }
+
+    public double getYAxisOffset() {
+        return yAxisOffset;
+    }
+
+    public void setTargetYAxisOffset(double offset) {
+        this.targetYAxisOffset = offset;
+    }
+    
+    public void updateTargetYAxisOffset(double offset) {
+    	this.targetYAxisOffset += offset;
+    }
 }

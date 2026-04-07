@@ -96,4 +96,44 @@ public class Updater {
 		
 		return false;
 	}
+	
+	public static void main(String[] args) {
+	    try {
+	        System.out.println("Updater started...");
+
+	        String pluginUrl = "https://github.com/DharshanPalani/bubblechat/releases/latest/download/BubbleChat.jar";
+
+	        Path pluginPath = Path.of("plugins", "BubbleChat.jar");
+
+	        Path tempPath = Path.of("plugins", "BubbleChat-new.jar");
+
+	        HttpClient client = HttpClient.newBuilder().followRedirects(HttpClient.Redirect.ALWAYS).build();
+
+	        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(pluginUrl)).GET().build();
+
+	        System.out.println("Downloading latest plugin...");
+
+	        HttpResponse<InputStream> response = client.send(request, HttpResponse.BodyHandlers.ofInputStream());
+	        
+	        if (response.statusCode() != 200) {
+	            System.out.println("Download failed! Status: " + response.statusCode());
+	            return;
+	        }
+
+	        try (InputStream in = response.body()) {
+	            Files.copy(in, tempPath, StandardCopyOption.REPLACE_EXISTING);
+	        }
+
+	        System.out.println("Download complete!");
+
+	        Thread.sleep(3000);
+
+	        Files.move(tempPath, pluginPath, StandardCopyOption.REPLACE_EXISTING);
+
+	        System.out.println("Plugin updated successfully!");
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	}
 }

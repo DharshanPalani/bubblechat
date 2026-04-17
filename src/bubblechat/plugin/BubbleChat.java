@@ -6,20 +6,20 @@ import org.joml.Vector3f;
 
 public class BubbleChat {
 
-    private final TextDisplay text;
+    private final TextDisplay textDisplay;
 
     private double yAxisOffset;
     private double targetYAxisOffset;
     
     private Vector3f scale;
     private Vector3f targetScale;
-    
-    BubbleChat(TextDisplay text, double initialOffset) {
-        this.text = text;
+
+    BubbleChat(TextDisplay textDisplay, double initialOffset) {
+        this.textDisplay = textDisplay;
         this.yAxisOffset = initialOffset;
         this.targetYAxisOffset = initialOffset;
         
-        this.targetScale = text.getTransformation().getScale();
+        this.targetScale = textDisplay.getTransformation().getScale();
         this.scale = new Vector3f(targetScale);
         
     }
@@ -32,7 +32,7 @@ public class BubbleChat {
 
         this.yAxisOffset += (targetYAxisOffset - yAxisOffset) * 0.2;
 
-        Transformation old = text.getTransformation();
+        Transformation old = textDisplay.getTransformation();
 
         Transformation updated = new Transformation(
             old.getTranslation(),
@@ -41,12 +41,15 @@ public class BubbleChat {
             old.getRightRotation()
         );
 
-        text.setTransformation(updated);
+        textDisplay.setTransformation(updated);
     }
-    
+
     public void updateTargetTextScale(float x, float y) {
     	targetScale.x = x;
     	targetScale.y = y;
+    }
+    
+    public void updateTargetTextColor() {
     }
     
     public void decreaseTargetTextScale(float percentage) {
@@ -57,7 +60,7 @@ public class BubbleChat {
     }
 
     public TextDisplay getTextDisplay() {
-        return text;
+        return textDisplay;
     }
 
     public double getYAxisOffset() {

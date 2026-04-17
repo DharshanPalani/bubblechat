@@ -39,7 +39,7 @@ public class Updater {
 	    try {
 	        Path updaterPath = Path.of("Updater.jar");
 
-	        HttpClient client = HttpClient.newHttpClient();
+	        HttpClient client = HttpClient.newBuilder().followRedirects(HttpClient.Redirect.ALWAYS).build();
 
 	        HttpRequest request = HttpRequest.newBuilder()
 	                .uri(URI.create(UPDATER_DOWNLOAD_URL))
@@ -79,7 +79,7 @@ public class Updater {
 	        Bukkit.getScheduler().runTaskLater(plugin, () -> {
 	            plugin.getLogger().info("Shutting down for update...");
 	            Bukkit.shutdown();
-	        }, 40L);
+	        }, 100L);
 
 	    } catch (Exception e) {
 	        plugin.getLogger().severe("Failed to run updater!");
@@ -87,19 +87,19 @@ public class Updater {
 	    }
 	}
 	
-	public static boolean checkForUpdate() {
-		String latestVersion = fetchVersion();
-		
-		if("0.3".equals(latestVersion)) {
-			return true;
-		}
-		
-		return false;
+	public static boolean checkForUpdate(Plugin plugin) {
+	    String latestVersion = fetchVersion();
+	    String currentVersion = plugin.getDescription().getVersion();
+	    System.out.println(currentVersion);
+	    
+	    if (latestVersion == null) return false;
+
+	    return !latestVersion.equals(currentVersion);
 	}
-	
+
 	public static void main(String[] args) {
-	    try {
-	        System.out.println("Updater started...");
+	    try {	    	
+	        System.out.println("Updater started.....");
 
 	        String pluginUrl = "https://github.com/DharshanPalani/bubblechat/releases/latest/download/BubbleChat.jar";
 

@@ -1,5 +1,5 @@
 name: BubbleChat
-version: 0.4
+version: 0.5
 main: bubblechat.plugin.Main
 api-version: 1.20
 author: Dharshan Palani

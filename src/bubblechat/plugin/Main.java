@@ -2,6 +2,7 @@ package bubblechat.plugin;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
@@ -47,14 +48,14 @@ public class Main extends JavaPlugin {
         }, 0L, 12000L);
         
         
-        
-//        This removes every single text display entity in the overworld
-//        for (Entity entity : Bukkit.getWorld("overworld").getEntities()) {
-//            if (entity instanceof TextDisplay) {
-//                entity.remove();
-//            }
-//        }
-
+        Bukkit.getScheduler().runTask(this, () -> {
+//        	when the plugin starts, it removes every single textDisplay which exists, since those don't have a gaurenteed way of being removed due to previous bugs.
+            for (World world : Bukkit.getWorlds()) {
+                for (TextDisplay display : world.getEntitiesByClass(TextDisplay.class)) {
+                    display.remove();
+                }
+            }
+        });
     }
     
     @Override

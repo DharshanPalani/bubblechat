@@ -90,7 +90,8 @@ public class Updater {
 	public static boolean checkForUpdate(Plugin plugin) {
 	    String latestVersion = fetchVersion();
 	    String currentVersion = plugin.getDescription().getVersion();
-	    System.out.println(currentVersion);
+//	    System.out.println(currentVersion);
+//	    System.out.println(latestVersion);
 	    
 	    if (latestVersion == null) return false;
 
